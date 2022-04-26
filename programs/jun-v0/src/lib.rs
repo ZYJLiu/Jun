@@ -12,7 +12,14 @@ pub mod jun_v0 {
     // REPLACE ADDRESS of usdc mint by running solana address -k .keys/usdc.json
     pub const USDC_MINT_ADDRESS: &str = "8tcH3BURNXa8d8hdCNzGonfwmscVbZo1KLdYi1d3iToV";
 
+    pub const SEED_JUN: &str = "JUN";
+    pub const SEED_DIAM: &str = "DIAM";
+
     use super::*;
+
+    pub fn create_mints(_ctx: Context<CreateMints>) -> Result<()> {
+        Ok(())
+    }
 
     pub fn create_usdc_token_bag(ctx: Context<CreateusdcTokenBag>) -> Result<()> {
         Ok(())
@@ -110,6 +117,35 @@ pub mod jun_v0 {
 
         Ok(())
     }
+}
+
+#[derive(Accounts)]
+pub struct CreateMints<'info> {
+    #[account(
+        init,
+        seeds = [SEED_JUN.as_bytes()],
+        bump,
+        payer = user,
+        mint::decimals = 6,
+        mint::authority = jun_mint, 
+        
+    )]
+    pub jun_mint: Account<'info, Mint>,
+        #[account(
+        init,
+        seeds = [SEED_DIAM.as_bytes()],
+        bump,
+        payer = user,
+        mint::decimals = 6,
+        mint::authority = diam_mint, 
+        
+    )]
+    pub diam_mint: Account<'info, Mint>,
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]
@@ -242,7 +278,7 @@ pub struct Redeem<'info> {
     pub user_diam_token_bag_authority: Signer<'info>,
 
     // ***********
-    // TRANSFER 🐮 TO USERS
+    // TRANSFER USDC TO USERS
     // ***********
 
     // see `token::Transfer.from`

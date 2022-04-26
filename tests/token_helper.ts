@@ -37,7 +37,6 @@ class TokenHelper {
       await randomPayer(), // randomPayer for testing
       this.mint, // Token Mint
       owner, // user with Authority over this Token Account
-      isPDA // is the owner a PDA (no for this use case because owner is a user wallet)
     );
   };
 }

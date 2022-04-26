@@ -1,7 +1,7 @@
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import * as anchor from "@project-serum/anchor";
 import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getMint } from "@solana/spl-token";
 import {
   diamMintAddress,
   junMintAddress,
@@ -211,6 +211,50 @@ describe("diam", () => {
     console.log("Shop Balance After Transaction");
     const post_shopusdc = await usdcToken.balance(shopUsdcTokenBag);
     console.log("USDC:", post_shopusdc);
+  });
+
+  it("Program Creates Mints", async () => {
+    // user is connected wallet
+    const user = new User();
+
+    const [junMint, jun_bump] = await PublicKey.findProgramAddress(
+      [Buffer.from(anchor.utils.bytes.utf8.encode("JUN"))],
+      program.programId
+    );
+
+    const [diamMint, diam_bump] = await PublicKey.findProgramAddress(
+      [Buffer.from(anchor.utils.bytes.utf8.encode("DIAM"))],
+      program.programId
+    );
+
+    try {
+      await program.rpc.createMints({
+        accounts: {
+          junMint: junMint,
+          diamMint: diamMint,
+          user: user.wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+      });
+
+      // get Token Mint Address
+      console.log("");
+      const jun = await getMint(connection, junMint);
+      console.log("JUN Mint Authority:", jun.mintAuthority.toString());
+      console.log("JUN Mint Address:", junMint.toString());
+
+      // get Token Mint Address
+      const diam = await getMint(connection, diamMint);
+      console.log("DIAM Mint Authority:", diam.mintAuthority.toString());
+      console.log("DIAM Mint Address:", diamMint.toString());
+
+      assert.isTrue(jun.mintAuthority.equals(junMint));
+      assert.isTrue(diam.mintAuthority.equals(diamMint));
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
 
