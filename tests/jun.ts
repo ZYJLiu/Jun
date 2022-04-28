@@ -5,6 +5,8 @@ import {
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
   getBalance,
+  Keypair,
+  LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
@@ -228,7 +230,7 @@ describe("diam", () => {
         diam_bump,
         jun_bump,
         usdcBagBump,
-        new anchor.BN(50_000_000_000),
+        new anchor.BN(50_000_000),
         {
           accounts: {
             // Token Program required to interact with Token Accounts
@@ -255,6 +257,9 @@ describe("diam", () => {
     } catch (error) {
       console.log(error);
     }
+
+    const balance3 = await connection.getTokenAccountBalance(usdcBagPDA);
+    console.log("USDC-PDA:", balance3);
 
     const balance = await connection.getTokenAccountBalance(usdc);
     console.log("USDC:", balance);
@@ -343,6 +348,28 @@ describe("diam", () => {
       userWallet.publicKey
     );
 
+    const Wallet = Keypair.generate();
+    const AirdropSignature = await connection.requestAirdrop(
+      Wallet.publicKey,
+      LAMPORTS_PER_SOL
+    );
+
+    console.log(Wallet.publicKey.toString());
+
+    await connection.confirmTransaction(AirdropSignature);
+
+    const shopUsdc = await getOrCreateAssociatedTokenAccount(
+      connection, // connection to Solana
+      Wallet, // randomPayer for testing
+      usdcMintAddress, // Token Mint
+      Wallet.publicKey // user with Authority over this Token Account
+    );
+
+    const shopUsdcAddress = await getAssociatedTokenAddress(
+      usdcMintAddress,
+      Wallet.publicKey
+    );
+
     // 2. Execute redeem instruction
     await program.rpc.redeem(usdcBagBump, new anchor.BN(30_000_000), {
       accounts: {
@@ -355,14 +382,17 @@ describe("diam", () => {
 
         // TRANSFER USDC TO USERS
         programUsdcTokenBag: usdcBagPDA,
-        userUsdcTokenBag: usdc,
+        userUsdcTokenBag: shopUsdcAddress,
         usdcMint: usdcMintAddress,
       },
       // signers: [userWallet],
     });
 
-    const balance = await connection.getTokenAccountBalance(usdc);
-    console.log("USDC:", balance);
+    const shop = await connection.getTokenAccountBalance(shopUsdcAddress);
+    console.log("SHOP USDC:", shop);
+
+    const balance3 = await connection.getTokenAccountBalance(usdcBagPDA);
+    console.log("USDC-PDA:", balance3);
 
     const balance1 = await connection.getTokenAccountBalance(diam);
     console.log("DIAM:", balance1);
