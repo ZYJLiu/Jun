@@ -1,13 +1,16 @@
 [features]
 seeds = false
 [programs.localnet]
-jun_v0 = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+jun_v0 = "7Yo9DesUhQnAVjzwsL6NX2CEpa1c5gTEn47bqaMYa5eP"
+
+[programs.devnet]
+jun_v0 = "7Yo9DesUhQnAVjzwsL6NX2CEpa1c5gTEn47bqaMYa5eP"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/johnliu/.config/solana/id.json"
 
 [scripts]

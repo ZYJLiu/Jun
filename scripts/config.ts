@@ -44,32 +44,41 @@ const getProgramDerivedAddress = async (
   );
 };
 
-// @ts-ignore
-const usdcData = JSON.parse(fs.readFileSync(".keys/usdc.json"));
-const usdcMintKeypair = Keypair.fromSecretKey(new Uint8Array(usdcData));
-const usdcMintAddress = usdcMintKeypair.publicKey;
-console.log(usdcMintAddress);
+// // @ts-ignore
+// const usdcData = JSON.parse(fs.readFileSync(".keys/usdc.json"));
+// const usdcMintKeypair = Keypair.fromSecretKey(new Uint8Array(usdcData));
+// const usdcMintAddress = usdcMintKeypair.publicKey;
+// console.log(usdcMintAddress);
+const usdcMintAddress = new PublicKey(
+  "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"
+);
 
-// @ts-ignore
-const diamData = JSON.parse(fs.readFileSync(".keys/diam.json"));
-const diamMintKeypair = Keypair.fromSecretKey(new Uint8Array(diamData));
-const diamMintAddress = diamMintKeypair.publicKey;
+// // @ts-ignore
+// const diamData = JSON.parse(fs.readFileSync(".keys/diam.json"));
+// const diamMintKeypair = Keypair.fromSecretKey(new Uint8Array(diamData));
+// const diamMintAddress = diamMintKeypair.publicKey;
+const diamMintAddress = new PublicKey(
+  "FviaKJxoMjUvhi1Rpd53WENJ1mFRp2h4LBANzLu5XRNq"
+);
 
-// @ts-ignore
-const junData = JSON.parse(fs.readFileSync(".keys/jun.json"));
-const junMintKeypair = Keypair.fromSecretKey(new Uint8Array(junData));
-const junMintAddress = junMintKeypair.publicKey;
+// // @ts-ignore
+// const junData = JSON.parse(fs.readFileSync(".keys/jun.json"));
+// const junMintKeypair = Keypair.fromSecretKey(new Uint8Array(junData));
+// const junMintAddress = junMintKeypair.publicKey;
+const junMintAddress = new PublicKey(
+  "9UJR9kw8BYXpYoVPr4ZwJpCC9FEwgwuGJqMHsA2ff4Pc"
+);
 
 export {
   program,
   connection,
   userWallet,
   randomPayer,
-  usdcMintKeypair,
+  // usdcMintKeypair,
   usdcMintAddress,
-  diamMintKeypair,
+  // diamMintKeypair,
   diamMintAddress,
-  junMintKeypair,
+  // junMintKeypair,
   junMintAddress,
   findUsdcMintAuthorityPDA,
   findDiamMintAuthorityPDA,

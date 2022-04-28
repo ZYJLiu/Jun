@@ -1,19 +1,24 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("7Yo9DesUhQnAVjzwsL6NX2CEpa1c5gTEn47bqaMYa5eP");
 
 #[program]
 pub mod jun_v0 {
-    // REPLACE ADDRESS of usdc mint by running solana address -k .keys/jun.json
-    pub const JUN_MINT_ADDRESS: &str = "6yeBQtBiVMk9b8TN5HeJY2FoDqGayUErDyV7JuL6gw4Y";
-    // REPLACE ADDRESS of diam mint by running solana address -k .keys/diam.json
-    pub const DIAM_MINT_ADDRESS: &str = "97oBv9RwwYyXJLunGaDstjKwteye4acQdxZAewy1wJku";
-    // REPLACE ADDRESS of usdc mint by running solana address -k .keys/usdc.json
-    pub const USDC_MINT_ADDRESS: &str = "8tcH3BURNXa8d8hdCNzGonfwmscVbZo1KLdYi1d3iToV";
+    // // REPLACE ADDRESS of usdc mint by running solana address -k .keys/jun.json
+    // pub const JUN_MINT_ADDRESS: &str = "6yeBQtBiVMk9b8TN5HeJY2FoDqGayUErDyV7JuL6gw4Y";
+    // // REPLACE ADDRESS of diam mint by running solana address -k .keys/diam.json
+    // pub const DIAM_MINT_ADDRESS: &str = "97oBv9RwwYyXJLunGaDstjKwteye4acQdxZAewy1wJku";
+    // // REPLACE ADDRESS of usdc mint by running solana address -k .keys/usdc.json
+    // pub const USDC_MINT_ADDRESS: &str = "8tcH3BURNXa8d8hdCNzGonfwmscVbZo1KLdYi1d3iToV";
+    
+    pub const USDC_MINT_ADDRESS: &str = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
 
     pub const SEED_JUN: &str = "JUN";
     pub const SEED_DIAM: &str = "DIAM";
+
+    pub const JUN_MINT_PDA: &str = "9UJR9kw8BYXpYoVPr4ZwJpCC9FEwgwuGJqMHsA2ff4Pc";
+    pub const DIAM_MINT_PDA: &str = "FviaKJxoMjUvhi1Rpd53WENJ1mFRp2h4LBANzLu5XRNq";
 
     use super::*;
 
@@ -39,8 +44,7 @@ pub mod jun_v0 {
         let jun_amount = usdc_amount;
 
         // mint DIAM to user
-        let diam_mint_address = ctx.accounts.diam_mint.key();
-        let seeds = &[diam_mint_address.as_ref(), &[diam_mint_authority_bump]];
+        let seeds = &[b"DIAM".as_ref(), &[diam_mint_authority_bump]];
         let signer = [&seeds[..]];
 
         let cpi_ctx = CpiContext::new_with_signer(
@@ -55,8 +59,7 @@ pub mod jun_v0 {
         token::mint_to(cpi_ctx, diam_amount)?;
 
         // mint JUN to user
-        let jun_mint_address = ctx.accounts.jun_mint.key();
-        let seeds = &[jun_mint_address.as_ref(), &[jun_mint_authority_bump]];
+        let seeds = &[b"JUN".as_ref(), &[jun_mint_authority_bump]];
         let signer = [&seeds[..]];
 
         let cpi_ctx = CpiContext::new_with_signer(
@@ -193,14 +196,14 @@ pub struct diam<'info> {
     // Check that diam_mint provided is expected Mint Account
     #[account(
     mut,
-    address = DIAM_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
+    address = DIAM_MINT_PDA.parse::<Pubkey>().unwrap(),
     )]
     pub diam_mint: Box<Account<'info, Mint>>,
 
     // Mint Authority for DIAM Mint Account
     /// CHECK: only used as a signing PDA
     #[account(
-    seeds = [ diam_mint.key().as_ref() ],
+    seeds = [ SEED_DIAM.as_bytes() ],
     bump = diam_mint_authority_bump,
     )]
     pub diam_mint_authority: UncheckedAccount<'info>,
@@ -213,14 +216,14 @@ pub struct diam<'info> {
     // Check that diam_mint provided is expected Mint Account
     #[account(
     mut,
-    address = JUN_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
+    address = JUN_MINT_PDA.parse::<Pubkey>().unwrap(),
     )]
     pub jun_mint: Box<Account<'info, Mint>>,
 
     // Mint Authority for JUN Mint Account
     /// CHECK: only used as a signing PDA
     #[account(
-    seeds = [ jun_mint.key().as_ref() ],
+    seeds = [ SEED_JUN.as_bytes() ],
     bump = jun_mint_authority_bump,
     )]
     pub jun_mint_authority: UncheckedAccount<'info>,
@@ -266,7 +269,7 @@ pub struct Redeem<'info> {
     // see `token::Burn.mint`
     #[account(
         mut,
-        address = DIAM_MINT_ADDRESS.parse::<Pubkey>().unwrap(),
+        address = DIAM_MINT_PDA.parse::<Pubkey>().unwrap(),
     )]
     pub diam_mint: Account<'info, Mint>,
 
