@@ -259,10 +259,7 @@ pub struct Redeem<'info> {
     // SPL Token Program
     pub token_program: Program<'info, Token>,
 
-    // ***********
     // BURNING USER'S DIAM
-    // ***********
-
     // see `token::Burn.mint`
     #[account(
         mut,
@@ -277,10 +274,7 @@ pub struct Redeem<'info> {
     // The authority allowed to mutate the above ⬆️
     pub user_diam_token_bag_authority: Signer<'info>,
 
-    // ***********
     // TRANSFER USDC TO USERS
-    // ***********
-
     // see `token::Transfer.from`
     #[account(
         mut,
